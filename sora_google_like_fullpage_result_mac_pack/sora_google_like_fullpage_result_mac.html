@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sora Search - 全画面ページ移動版</title>
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;font-family:Arial,-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;background:#fff;color:#202124}
+button,input{font:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button:focus,input:focus,a:focus{outline:2px solid #1a73e8;outline-offset:2px}
+a{color:inherit}
+.hidden{display:none!important}
+.topbar{height:60px;display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:0 22px;font-size:14px;color:#3c4043}
+.topbar button{border:0;background:transparent;color:#3c4043;padding:8px}
+.apps{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#f1f3f4;color:#5f6368;font-weight:700}
+.sign{border:0;border-radius:20px;background:#1a73e8!important;color:#fff!important;padding:10px 18px!important;font-weight:700}
+.home{min-height:100vh;display:flex;flex-direction:column}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12vh;padding-left:16px;padding-right:16px;text-align:center}
+.logoText{font-size:clamp(52px,12vw,90px);font-weight:700;letter-spacing:-.08em;margin-bottom:28px;line-height:1;user-select:none}
+.logoSmall{font-size:30px;font-weight:700;letter-spacing:-.08em;line-height:1;white-space:nowrap;user-select:none}
+.b{color:#4285f4}.r{color:#ea4335}.y{color:#fbbc05}.g{color:#34a853}.dark{color:#5f6368}
+.searchBox{width:min(640px,94vw);height:48px;border:1px solid #dfe1e5;border-radius:999px;display:flex;align-items:center;gap:12px;padding:0 16px;background:#fff;box-shadow:none;transition:.15s}
+.searchBox:hover,.searchBox:focus-within{box-shadow:0 1px 6px rgba(32,33,36,.28);border-color:transparent}
+.searchIcon{color:#9aa0a6;font-size:18px}
+.searchBox input{flex:1;border:0;outline:0;font-size:16px;background:transparent;color:#202124;min-width:0}
+.mic{border:0;background:transparent;color:#4285f4;font-size:18px;padding:4px}
+.homeBtns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:28px}
+.homeBtns button,.pillBtn{border:1px solid #f8f9fa;background:#f8f9fa;color:#3c4043;border-radius:4px;padding:10px 16px;font-size:14px}
+.homeBtns button:hover,.pillBtn:hover{border-color:#dadce0;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.hint{margin-top:28px;color:#5f6368;font-size:13px;line-height:1.8;max-width:720px}
+.header{display:flex;align-items:center;gap:24px;padding:20px 28px 14px;border-bottom:1px solid #ebebeb;position:sticky;top:0;background:#fff;z-index:10}
+.header .searchBox{width:min(720px,calc(100vw - 180px));height:44px}
+.tabs{display:flex;gap:26px;margin-left:170px;padding:0 28px;height:42px;align-items:center;border-bottom:1px solid #ebebeb;color:#5f6368;font-size:14px}
+.tabActive{color:#1a73e8;border-bottom:3px solid #1a73e8;height:42px;display:flex;align-items:center}
+.resultsWrap{max-width:760px;margin-left:170px;padding:16px 20px 80px}
+.stats{font-size:14px;color:#70757a;margin:2px 0 20px}
+.result{padding:10px 0 18px}
+.resultTop{display:flex;align-items:center;gap:10px;margin-bottom:4px;color:#202124;font-size:14px}
+.favicon{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#f1f3f4;color:#5f6368;font-weight:700;font-size:12px;flex:0 0 auto}
+.url{color:#3c4043;font-size:13px;word-break:break-all}
+.resultTitle{display:inline-block;color:#1a0dab;font-size:20px;line-height:1.3;text-decoration:none;margin:2px 0 4px}
+.resultTitle:hover{text-decoration:underline}
+.snippet{color:#4d5156;font-size:14px;line-height:1.58;max-width:690px}
+.tagRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:12px;background:#f1f3f4;border-radius:999px;padding:4px 9px;color:#5f6368}
+.noResults{padding:28px;border:1px solid #dadce0;border-radius:14px;background:#fff;color:#3c4043;line-height:1.8}
+.siteHeader{height:58px;display:flex;align-items:center;gap:14px;padding:0 18px;border-bottom:1px solid #e0e0e0;background:#fff;position:sticky;top:0;z-index:20}
+.backBtn{border:0;background:#f1f3f4;color:#3c4043;border-radius:999px;padding:9px 14px;font-weight:700}
+.siteAddress{flex:1;min-width:0;height:38px;border-radius:999px;background:#f1f3f4;color:#5f6368;display:flex;align-items:center;padding:0 16px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.siteMain{max-width:980px;margin:0 auto;padding:34px 20px 80px}
+.breadcrumb{font-size:13px;color:#5f6368;margin-bottom:20px}
+.articleHero{border-bottom:1px solid #e8eaed;padding-bottom:26px;margin-bottom:26px}
+.articleHero h1{font-size:clamp(30px,6vw,52px);letter-spacing:-.03em;line-height:1.1;margin:0 0 14px;color:#202124}
+.articleHero p{font-size:17px;color:#4d5156;line-height:1.8;margin:0;max-width:820px}
+.articleGrid{display:grid;grid-template-columns:1fr 280px;gap:34px;align-items:start}
+.articleBody section{padding:20px 0;border-bottom:1px solid #f1f3f4}
+.articleBody h2{font-size:24px;margin:0 0 10px;color:#202124}
+.articleBody p{font-size:16px;line-height:1.9;color:#3c4043;margin:0}
+.sideCard{border:1px solid #dadce0;border-radius:18px;padding:18px;background:#fff;box-shadow:0 1px 2px rgba(60,64,67,.12)}
+.sideCard h3{margin:0 0 10px;font-size:17px}
+.sideCard p{margin:0 0 12px;color:#5f6368;line-height:1.7;font-size:14px}
+.downloadHero{border:1px solid #dadce0;border-radius:26px;padding:28px;background:linear-gradient(180deg,#fff,#f8fafd);box-shadow:0 1px 3px rgba(60,64,67,.15)}
+.downloadTop{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.bigIcon{width:72px;height:72px;border-radius:22px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:26px;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.downloadHero h1{font-size:clamp(28px,5vw,46px);margin:0 0 6px;line-height:1.1}
+.downloadHero p{margin:0;color:#5f6368;line-height:1.75}
+.actionRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.primaryBtn{border:0;border-radius:999px;background:#1a73e8;color:#fff;padding:12px 18px;font-weight:800}
+.secondaryBtn{border:1px solid #dadce0;border-radius:999px;background:#fff;color:#3c4043;padding:12px 18px;font-weight:800}
+.infoBoxes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.infoBox{border:1px solid #e8eaed;border-radius:16px;padding:14px;background:#fff}
+.infoBox b{display:block;margin-bottom:6px}
+.infoBox span{color:#5f6368;font-size:13px;line-height:1.6}
+.loginPanel{border:1px solid #dadce0;border-radius:22px;padding:22px;margin-top:28px;background:#fff}
+.loginPanel h2{margin:0 0 8px}
+.loginPanel p{margin:0 0 16px;color:#5f6368;line-height:1.7}
+.fileDrop{border:2px dashed #dadce0;border-radius:18px;padding:20px;text-align:center;background:#f8f9fa;margin-bottom:16px}
+.fileDrop input{width:100%;max-width:420px}
+.methodList{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.methodBtn{border:1px solid #dadce0;background:#fff;border-radius:999px;padding:10px 14px;font-weight:800;color:#3c4043}
+.methodBtn.active{background:#e8f0fe;border-color:#1a73e8;color:#174ea6}
+.loginForm{display:grid;gap:10px;max-width:430px}
+.loginForm input{border:1px solid #dadce0;border-radius:12px;padding:12px 14px}
+.status{min-height:24px;color:#188038;font-weight:800;margin-top:10px}
+.codeBox{margin-top:18px;background:#202124;color:#e8eaed;border-radius:18px;padding:16px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.6;max-height:220px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#202124;color:#fff;padding:12px 16px;border-radius:999px;box-shadow:0 8px 28px rgba(0,0,0,.25);font-size:14px;z-index:100;opacity:0;pointer-events:none;transition:.2s}
+.toast.show{opacity:1}
+@media(max-width:820px){
+  .header{gap:12px;padding:14px;align-items:flex-start;flex-wrap:wrap}
+  .header .searchBox{width:100%;order:2}
+  .tabs{margin-left:0;padding:0 14px;overflow:auto}
+  .resultsWrap{margin-left:0;padding:14px 16px 70px}
+  .resultTitle{font-size:18px}
+  .articleGrid{grid-template-columns:1fr}
+  .infoBoxes{grid-template-columns:1fr}
+  .siteHeader{padding:0 10px}
+  .siteAddress{font-size:12px}
+  .logoSmall{font-size:25px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+<script>
+'use strict';
+const RECORDS = [{"id": "tourism-deep", "kind": "article", "title": "観光Deep Research：旅行前に調べるべきことを一枚で整理", "url": "https://sora-search.local/research/tourism-deep", "description": "観光地の魅力、混雑、アクセス、安全、撮影ポイント、季節ごとの注意をまとめる検索結果です。", "keywords": "観光 Deep Research ディープリサーチ 旅行 調査 観光系 情報 まとめ", "sections": [{"h": "何が分かるページ？", "p": "観光地をただ紹介するだけではなく、「いつ行くと良いか」「どこで混むか」「誰向けか」「写真や動画に向くか」までまとめるページです。"}, {"h": "調べる観点", "p": "アクセス、滞在時間、混雑ピーク、雨の日プラン、子ども連れ、撮影許可、夜の安全、周辺飲食店、SNS向きの見せ方を分けて確認します。"}, {"h": "使い方", "p": "例として「奈良 夜観光」「京都 雨の日」「沖縄 海 安全」のように検索すると、普通の観光情報と調査メモが一緒に出ます。"}]}, {"id": "nara-night", "kind": "article", "title": "奈良の夜観光：静かな街歩きとバー文化を楽しむ", "url": "https://sora-search.local/travel/nara-night", "description": "奈良公園、猿沢池、ならまち、きたまち周辺の夜の雰囲気を、撮影・観光PR目線で整理。", "keywords": "奈良 夜観光 ナイトエコノミー 奈良市 バー LAMP BAR 猿沢池 ならまち きたまち 観光 PR", "sections": [{"h": "概要", "p": "奈良の夜は派手な観光地というより、昼の観光後に街の静けさ・灯り・歴史の余韻を楽しむ方向が合います。"}, {"h": "具体的な回り方", "p": "夕方に奈良公園や猿沢池周辺を歩き、ならまち方面で食事、そのあとバーや夜の街並みへ流すと自然です。観光PRでは「昼の大仏」だけではなく「夜の余韻」を見せると差別化できます。"}, {"h": "注意点", "p": "夜遅くまで開いている観光施設は多くないので、飲食店やバー、ライトアップ、宿泊導線と合わせて考えるのが大事です。"}]}, {"id": "kyoto-basic", "kind": "article", "title": "京都観光：王道ルートと混雑を避ける考え方", "url": "https://sora-search.local/travel/kyoto-basic", "description": "清水寺、祇園、嵐山、伏見稲荷などを、混雑回避と移動のしやすさで整理。", "keywords": "京都 観光 清水寺 祇園 嵐山 伏見稲荷 混雑 回避 旅行", "sections": [{"h": "王道だけで詰めすぎない", "p": "京都は有名スポットが離れているので、1日に清水寺・嵐山・伏見稲荷を全部入れると移動だけで疲れます。エリアを絞る方が満足度が上がりやすいです。"}, {"h": "混雑回避", "p": "朝早め、夕方以降、雨の日、メイン通りから一本外す、という工夫が効きます。写真目的なら時間帯を先に決めるのが重要です。"}, {"h": "子ども連れの場合", "p": "階段や坂が多い場所もあるので、休憩場所とトイレ位置を先に押さえると楽になります。"}]}, {"id": "osaka-food", "kind": "article", "title": "大阪観光：食・ホテル・イベントを中心に組む", "url": "https://sora-search.local/travel/osaka-food-event", "description": "梅田、難波、ホテルイベント、食べ歩きなどを短時間で楽しむ考え方。", "keywords": "大阪 観光 食 ホテル イベント 梅田 難波 心斎橋 撮影", "sections": [{"h": "大阪は目的を決めると強い", "p": "大阪は「食べる」「買う」「イベントに行く」「ホテルで過ごす」のように目的を決めると動きやすいです。"}, {"h": "撮影目線", "p": "ホテルイベントやセミナーは、会場全体・手元・表情・乾杯・外観の順に撮ると編集しやすくなります。"}, {"h": "短時間プラン", "p": "梅田周辺だけ、難波周辺だけなど、エリアを絞ると移動の疲れが減ります。"}]}, {"id": "okinawa-sea", "kind": "article", "title": "沖縄観光：海の楽しさと安全の基本", "url": "https://sora-search.local/travel/okinawa-sea-safety", "description": "沖縄の海遊び、天候、日差し、子ども連れの安全ポイントを整理。", "keywords": "沖縄 観光 海 安全 シュノーケル 子連れ 天気 台風 日差し", "sections": [{"h": "海は天気だけで判断しない", "p": "晴れていても波や潮の流れが強い日は危険です。現地の案内、遊泳可否、監視員の有無を優先します。"}, {"h": "子ども連れ", "p": "ライフジャケット、浅瀬、日陰、休憩、飲み物をセットで考えると安心です。夢中になるほど疲れに気づきにくいので、短い時間で区切ります。"}, {"h": "撮影目線", "p": "海の青さは午前〜昼に出やすいですが、人物は逆光や日差しが強すぎると撮りにくくなります。"}]}, {"id": "tourism-pr-video", "kind": "article", "title": "観光PR動画の作り方：場所紹介より体験の流れを見せる", "url": "https://sora-search.local/creative/tourism-pr-video", "description": "観光動画で、ただの記録ではなく行きたくなる構成にする考え方。", "keywords": "観光 PR 動画 撮影 リール SNS 旅行 企画 構成", "sections": [{"h": "場所より気分を先に見せる", "p": "観光PRでは「ここに何があるか」だけでなく、「行くとどんな気分になるか」が重要です。歩く、見つける、食べる、夜に余韻が残る、という流れを作ります。"}, {"h": "構成例", "p": "1秒目で印象的な景色、次に人の動き、続いて食や体験、最後にもう一度象徴的なカット。短い動画でも起承転結を作れます。"}, {"h": "検索とのつなげ方", "p": "検索結果の説明文には、混雑・アクセス・所要時間など現実的な情報も入れると、見た人が行動しやすくなります。"}]}, {"id": "login-lab", "kind": "tool", "title": "HTMLログイン拡張を読み込むテストページ", "url": "https://sora-search.local/tools/login-extension-loader", "description": "ダウンロードしたログイン拡張HTMLを選ぶと、ログイン方法として追加されるテスト画面。", "keywords": "ログイン 拡張 html 読み込み テスト MiraGate DevSphere SoraPass NovaKey LeafLock ChronoDoor", "sections": []}, {"id": "ext-miragate", "kind": "extension", "name": "MiraGate", "title": "MiraGate Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/MiraGate_PC_Login_Extension.html", "filename": "MiraGate_PC_Login_Extension.html", "description": "出品カルテLiteなどで使えるMiraGateログイン拡張HTML。旧MiraGate形式のmetaにも対応。", "keywords": "MiraGate miragate ミラゲート ログイン 拡張 html ダウンロード sora!", "password": "sora!", "color": "#14b8a6", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>MiraGate Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"miragate\">\n<meta name=\"sora-login-extension-name\" content=\"MiraGate\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"MIRAGATE-PC-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"sora!\">\n<meta name=\"sora-login-extension-icon\" content=\"◇\">\n<meta name=\"sora-login-extension-color-a\" content=\"#7c3aed\">\n<meta name=\"sora-login-extension-color-b\" content=\"#14b8a6\">\n<meta name=\"sora-login-extension-description\" content=\"MiraGateログインを追加するHTML拡張。古いMiraGate形式にも対応。\">\n<meta name=\"miragate-extension-type\" content=\"ListingKarte-MiraGate-PC-Extension-HTML\">\n<meta name=\"miragate-extension-name\" content=\"MiraGate\">\n<meta name=\"miragate-extension-version\" content=\"2\">\n<meta name=\"miragate-extension-key\" content=\"MIRAGATE-PC-LOGIN-HTML-OK\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#7c3aed 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#14b8a6 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#7c3aed,#14b8a6);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#7c3aed,#14b8a6);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#7c3aed,#14b8a6);box-shadow:0 18px 40px color-mix(in srgb,#7c3aed 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">MiraGate Extension</div>\n    <div class=\"icon\">◇</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>MiraGate</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">MIRAGATE-PC-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：sora!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-devsphere", "kind": "extension", "name": "DevSphere", "title": "DevSphere Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/DevSphere_Login_Extension.html", "filename": "DevSphere_Login_Extension.html", "description": "DevSphere用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "DevSphere login ログイン 拡張 html ダウンロード dev!", "password": "dev!", "color": "#7c3aed", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>DevSphere Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"devsphere\">\n<meta name=\"sora-login-extension-name\" content=\"DevSphere\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"DEVSPHERE-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"dev!\">\n<meta name=\"sora-login-extension-icon\" content=\"⌬\">\n<meta name=\"sora-login-extension-color-a\" content=\"#0f172a\">\n<meta name=\"sora-login-extension-color-b\" content=\"#38bdf8\">\n<meta name=\"sora-login-extension-description\" content=\"DevSphereでログインするための開発者風HTML拡張。黒いターミナル感のある画面。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#0f172a 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#38bdf8 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#0f172a,#38bdf8);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0f172a,#38bdf8);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#0f172a,#38bdf8);box-shadow:0 18px 40px color-mix(in srgb,#0f172a 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">DevSphere Extension</div>\n    <div class=\"icon\">⌬</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>DevSphere</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">DEVSPHERE-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：dev!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-sorapass", "kind": "extension", "name": "SoraPass", "title": "SoraPass Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/SoraPass_Login_Extension.html", "filename": "SoraPass_Login_Extension.html", "description": "SoraPass用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "SoraPass login ログイン 拡張 html ダウンロード sky!", "password": "sky!", "color": "#4285f4", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>SoraPass Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"sorapass\">\n<meta name=\"sora-login-extension-name\" content=\"SoraPass\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"SORAPASS-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"sky!\">\n<meta name=\"sora-login-extension-icon\" content=\"☁\">\n<meta name=\"sora-login-extension-color-a\" content=\"#38bdf8\">\n<meta name=\"sora-login-extension-color-b\" content=\"#6366f1\">\n<meta name=\"sora-login-extension-description\" content=\"SoraPassログインを追加するHTML拡張。青空テーマで子ども向けアプリにも合う。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#38bdf8 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#6366f1 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#38bdf8,#6366f1);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#38bdf8,#6366f1);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#38bdf8,#6366f1);box-shadow:0 18px 40px color-mix(in srgb,#38bdf8 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">SoraPass Extension</div>\n    <div class=\"icon\">☁</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>SoraPass</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">SORAPASS-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：sky!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-novakey", "kind": "extension", "name": "NovaKey", "title": "NovaKey Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/NovaKey_Login_Extension.html", "filename": "NovaKey_Login_Extension.html", "description": "NovaKey用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "NovaKey login ログイン 拡張 html ダウンロード nova!", "password": "nova!", "color": "#fbbc05", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>NovaKey Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"novakey\">\n<meta name=\"sora-login-extension-name\" content=\"NovaKey\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"NOVAKEY-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"nova!\">\n<meta name=\"sora-login-extension-icon\" content=\"✦\">\n<meta name=\"sora-login-extension-color-a\" content=\"#4f46e5\">\n<meta name=\"sora-login-extension-color-b\" content=\"#ec4899\">\n<meta name=\"sora-login-extension-description\" content=\"NovaKeyログインを追加するHTML拡張。星・宇宙・ネオン系の画面になる。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#4f46e5 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#ec4899 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#4f46e5,#ec4899);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#4f46e5,#ec4899);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#4f46e5,#ec4899);box-shadow:0 18px 40px color-mix(in srgb,#4f46e5 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">NovaKey Extension</div>\n    <div class=\"icon\">✦</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>NovaKey</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">NOVAKEY-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：nova!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-leaflock", "kind": "extension", "name": "LeafLock", "title": "LeafLock Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/LeafLock_Login_Extension.html", "filename": "LeafLock_Login_Extension.html", "description": "LeafLock用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "LeafLock login ログイン 拡張 html ダウンロード leaf!", "password": "leaf!", "color": "#34a853", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>LeafLock Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"leaflock\">\n<meta name=\"sora-login-extension-name\" content=\"LeafLock\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"LEAFLOCK-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"leaf!\">\n<meta name=\"sora-login-extension-icon\" content=\"♧\">\n<meta name=\"sora-login-extension-color-a\" content=\"#16a34a\">\n<meta name=\"sora-login-extension-color-b\" content=\"#84cc16\">\n<meta name=\"sora-login-extension-description\" content=\"LeafLockログインを追加するHTML拡張。観葉植物・自然系のアプリに合う。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#16a34a 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#84cc16 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#16a34a,#84cc16);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#16a34a,#84cc16);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#16a34a,#84cc16);box-shadow:0 18px 40px color-mix(in srgb,#16a34a 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">LeafLock Extension</div>\n    <div class=\"icon\">♧</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>LeafLock</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">LEAFLOCK-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：leaf!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-chronodoor", "kind": "extension", "name": "ChronoDoor", "title": "ChronoDoor Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/ChronoDoor_Login_Extension.html", "filename": "ChronoDoor_Login_Extension.html", "description": "ChronoDoor用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "ChronoDoor login ログイン 拡張 html ダウンロード chrono!", "password": "chrono!", "color": "#ea4335", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>ChronoDoor Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"chronodoor\">\n<meta name=\"sora-login-extension-name\" content=\"ChronoDoor\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"CHRONODOOR-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"time!\">\n<meta name=\"sora-login-extension-icon\" content=\"◴\">\n<meta name=\"sora-login-extension-color-a\" content=\"#b45309\">\n<meta name=\"sora-login-extension-color-b\" content=\"#f59e0b\">\n<meta name=\"sora-login-extension-description\" content=\"ChronoDoorログインを追加するHTML拡張。時計・金色・扉の雰囲気。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#b45309 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#f59e0b 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#b45309,#f59e0b);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#b45309,#f59e0b);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#b45309,#f59e0b);box-shadow:0 18px 40px color-mix(in srgb,#b45309 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">ChronoDoor Extension</div>\n    <div class=\"icon\">◴</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>ChronoDoor</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">CHRONODOOR-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：time!</p>\n  </main>\n</body>\n</html>"}];
+const EXTENSIONS = [{"id": "ext-miragate", "kind": "extension", "name": "MiraGate", "title": "MiraGate Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/MiraGate_PC_Login_Extension.html", "filename": "MiraGate_PC_Login_Extension.html", "description": "出品カルテLiteなどで使えるMiraGateログイン拡張HTML。旧MiraGate形式のmetaにも対応。", "keywords": "MiraGate miragate ミラゲート ログイン 拡張 html ダウンロード sora!", "password": "sora!", "color": "#14b8a6", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>MiraGate Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"miragate\">\n<meta name=\"sora-login-extension-name\" content=\"MiraGate\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"MIRAGATE-PC-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"sora!\">\n<meta name=\"sora-login-extension-icon\" content=\"◇\">\n<meta name=\"sora-login-extension-color-a\" content=\"#7c3aed\">\n<meta name=\"sora-login-extension-color-b\" content=\"#14b8a6\">\n<meta name=\"sora-login-extension-description\" content=\"MiraGateログインを追加するHTML拡張。古いMiraGate形式にも対応。\">\n<meta name=\"miragate-extension-type\" content=\"ListingKarte-MiraGate-PC-Extension-HTML\">\n<meta name=\"miragate-extension-name\" content=\"MiraGate\">\n<meta name=\"miragate-extension-version\" content=\"2\">\n<meta name=\"miragate-extension-key\" content=\"MIRAGATE-PC-LOGIN-HTML-OK\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#7c3aed 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#14b8a6 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#7c3aed,#14b8a6);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#7c3aed,#14b8a6);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#7c3aed,#14b8a6);box-shadow:0 18px 40px color-mix(in srgb,#7c3aed 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">MiraGate Extension</div>\n    <div class=\"icon\">◇</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>MiraGate</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">MIRAGATE-PC-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：sora!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-devsphere", "kind": "extension", "name": "DevSphere", "title": "DevSphere Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/DevSphere_Login_Extension.html", "filename": "DevSphere_Login_Extension.html", "description": "DevSphere用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "DevSphere login ログイン 拡張 html ダウンロード dev!", "password": "dev!", "color": "#7c3aed", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>DevSphere Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"devsphere\">\n<meta name=\"sora-login-extension-name\" content=\"DevSphere\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"DEVSPHERE-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"dev!\">\n<meta name=\"sora-login-extension-icon\" content=\"⌬\">\n<meta name=\"sora-login-extension-color-a\" content=\"#0f172a\">\n<meta name=\"sora-login-extension-color-b\" content=\"#38bdf8\">\n<meta name=\"sora-login-extension-description\" content=\"DevSphereでログインするための開発者風HTML拡張。黒いターミナル感のある画面。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#0f172a 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#38bdf8 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#0f172a,#38bdf8);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#0f172a,#38bdf8);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#0f172a,#38bdf8);box-shadow:0 18px 40px color-mix(in srgb,#0f172a 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">DevSphere Extension</div>\n    <div class=\"icon\">⌬</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>DevSphere</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">DEVSPHERE-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：dev!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-sorapass", "kind": "extension", "name": "SoraPass", "title": "SoraPass Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/SoraPass_Login_Extension.html", "filename": "SoraPass_Login_Extension.html", "description": "SoraPass用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "SoraPass login ログイン 拡張 html ダウンロード sky!", "password": "sky!", "color": "#4285f4", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>SoraPass Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"sorapass\">\n<meta name=\"sora-login-extension-name\" content=\"SoraPass\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"SORAPASS-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"sky!\">\n<meta name=\"sora-login-extension-icon\" content=\"☁\">\n<meta name=\"sora-login-extension-color-a\" content=\"#38bdf8\">\n<meta name=\"sora-login-extension-color-b\" content=\"#6366f1\">\n<meta name=\"sora-login-extension-description\" content=\"SoraPassログインを追加するHTML拡張。青空テーマで子ども向けアプリにも合う。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#38bdf8 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#6366f1 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#38bdf8,#6366f1);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#38bdf8,#6366f1);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#38bdf8,#6366f1);box-shadow:0 18px 40px color-mix(in srgb,#38bdf8 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">SoraPass Extension</div>\n    <div class=\"icon\">☁</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>SoraPass</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">SORAPASS-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：sky!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-novakey", "kind": "extension", "name": "NovaKey", "title": "NovaKey Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/NovaKey_Login_Extension.html", "filename": "NovaKey_Login_Extension.html", "description": "NovaKey用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "NovaKey login ログイン 拡張 html ダウンロード nova!", "password": "nova!", "color": "#fbbc05", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>NovaKey Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"novakey\">\n<meta name=\"sora-login-extension-name\" content=\"NovaKey\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"NOVAKEY-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"nova!\">\n<meta name=\"sora-login-extension-icon\" content=\"✦\">\n<meta name=\"sora-login-extension-color-a\" content=\"#4f46e5\">\n<meta name=\"sora-login-extension-color-b\" content=\"#ec4899\">\n<meta name=\"sora-login-extension-description\" content=\"NovaKeyログインを追加するHTML拡張。星・宇宙・ネオン系の画面になる。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#4f46e5 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#ec4899 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#4f46e5,#ec4899);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#4f46e5,#ec4899);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#4f46e5,#ec4899);box-shadow:0 18px 40px color-mix(in srgb,#4f46e5 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">NovaKey Extension</div>\n    <div class=\"icon\">✦</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>NovaKey</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">NOVAKEY-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：nova!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-leaflock", "kind": "extension", "name": "LeafLock", "title": "LeafLock Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/LeafLock_Login_Extension.html", "filename": "LeafLock_Login_Extension.html", "description": "LeafLock用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "LeafLock login ログイン 拡張 html ダウンロード leaf!", "password": "leaf!", "color": "#34a853", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>LeafLock Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"leaflock\">\n<meta name=\"sora-login-extension-name\" content=\"LeafLock\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"LEAFLOCK-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"leaf!\">\n<meta name=\"sora-login-extension-icon\" content=\"♧\">\n<meta name=\"sora-login-extension-color-a\" content=\"#16a34a\">\n<meta name=\"sora-login-extension-color-b\" content=\"#84cc16\">\n<meta name=\"sora-login-extension-description\" content=\"LeafLockログインを追加するHTML拡張。観葉植物・自然系のアプリに合う。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#16a34a 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#84cc16 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#16a34a,#84cc16);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#16a34a,#84cc16);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#16a34a,#84cc16);box-shadow:0 18px 40px color-mix(in srgb,#16a34a 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">LeafLock Extension</div>\n    <div class=\"icon\">♧</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>LeafLock</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">LEAFLOCK-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：leaf!</p>\n  </main>\n</body>\n</html>"}, {"id": "ext-chronodoor", "kind": "extension", "name": "ChronoDoor", "title": "ChronoDoor Login Extension - HTMLダウンロード", "url": "https://sora-search.local/extensions/ChronoDoor_Login_Extension.html", "filename": "ChronoDoor_Login_Extension.html", "description": "ChronoDoor用のログイン拡張HTML。読み込むとログイン方法として追加できます。", "keywords": "ChronoDoor login ログイン 拡張 html ダウンロード chrono!", "password": "chrono!", "color": "#ea4335", "html": "<!doctype html>\n<html lang=\"ja\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>ChronoDoor Login Extension</title>\n<meta name=\"sora-login-extension-type\" content=\"SoraLoginHTML\">\n<meta name=\"sora-login-extension-id\" content=\"chronodoor\">\n<meta name=\"sora-login-extension-name\" content=\"ChronoDoor\">\n<meta name=\"sora-login-extension-version\" content=\"2\">\n<meta name=\"sora-login-extension-key\" content=\"CHRONODOOR-LOGIN-HTML-OK\">\n<meta name=\"sora-login-extension-password\" content=\"time!\">\n<meta name=\"sora-login-extension-icon\" content=\"◴\">\n<meta name=\"sora-login-extension-color-a\" content=\"#b45309\">\n<meta name=\"sora-login-extension-color-b\" content=\"#f59e0b\">\n<meta name=\"sora-login-extension-description\" content=\"ChronoDoorログインを追加するHTML拡張。時計・金色・扉の雰囲気。\">\n<style>\n*{box-sizing:border-box}\nbody{\n  margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;\n  font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;\n  background:radial-gradient(circle at 20% 20%, color-mix(in srgb,#b45309 46%, transparent), transparent 36%),\n             radial-gradient(circle at 84% 12%, color-mix(in srgb,#f59e0b 42%, transparent), transparent 34%),\n             linear-gradient(135deg,#0f172a,#b45309,#f59e0b);\n  color:#111827;\n}\n.card{width:min(480px,94vw);padding:28px;border-radius:30px;background:rgba(255,255,255,.93);border:1px solid rgba(255,255,255,.7);box-shadow:0 30px 90px rgba(0,0,0,.35);text-align:center}\n.badge{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:32px;padding:0 13px;border-radius:999px;color:#fff;background:linear-gradient(135deg,#b45309,#f59e0b);font-size:12px;font-weight:1000;letter-spacing:.08em}\n.icon{width:70px;height:70px;margin:16px auto 0;border-radius:24px;display:grid;place-items:center;color:#fff;font-size:38px;background:linear-gradient(135deg,#b45309,#f59e0b);box-shadow:0 18px 40px color-mix(in srgb,#b45309 35%, transparent)}\nh1{margin:14px 0 8px;color:#111827;font-size:30px}\np{margin:0;color:#475569;line-height:1.7;font-weight:750}\n.code{margin-top:16px;padding:12px;border-radius:16px;background:#0f172a;color:#ccfbf1;font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all}\n.small{margin-top:10px;font-size:12px;color:#64748b}\n</style>\n</head>\n<body>\n  <main class=\"card\">\n    <div class=\"badge\">ChronoDoor Extension</div>\n    <div class=\"icon\">◴</div>\n    <h1>これはログイン用です</h1>\n    <p>このHTMLは、対応アプリに読み込むと <b>ChronoDoor</b> ログインを追加する拡張ファイルです。</p>\n    <div class=\"code\">CHRONODOOR-LOGIN-HTML-OK</div>\n    <p class=\"small\">読み込みテスト用パスワード：time!</p>\n  </main>\n</body>\n</html>"}];
+const state = { lastQuery: '', imported: [], selectedMethod: null };
+const app = document.getElementById('app');
+const toastEl = document.getElementById('toast');
+const STORAGE_KEY = 'soraSearchImportedLoginExtensions.v2';
+
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function logo(cls) {
+  const small = cls === 'logoSmall';
+  const label = small ? 'Sora' : 'SoraSearch';
+  const spans = label.split('').map((ch,i)=>{
+    const colors=['b','r','y','b','g','r','dark','b','r','y'];
+    return `<span class="${colors[i%colors.length]}">${esc(ch)}<\/span>`;
+  }).join('');
+  return `<div class="${cls}" aria-label="Sora Search">${spans}<\/div>`;
+}
+function normalize(text) { return String(text||'').toLowerCase().replace(/\s+/g,' ').trim(); }
+function scoreRecord(rec, query) {
+  const q = normalize(query);
+  if (!q) return rec.kind === 'extension' ? 2 : 3;
+  const words = q.split(' ').filter(Boolean);
+  const hay = normalize([rec.title,rec.description,rec.url,rec.keywords,rec.name,rec.filename].join(' '));
+  let score = 0;
+  for (const w of words) {
+    if (hay.includes(w)) score += 8;
+    if (normalize(rec.title).includes(w)) score += 6;
+    if (normalize(rec.keywords).includes(w)) score += 4;
+  }
+  if (hay.includes(q)) score += 12;
+  return score;
+}
+function searchRecords(query) {
+  const q = normalize(query);
+  const all = RECORDS.map(rec => ({...rec, score: scoreRecord(rec,q)}));
+  const filtered = q ? all.filter(r => r.score > 0) : all;
+  return filtered.sort((a,b)=>b.score-a.score || a.title.localeCompare(b.title,'ja')).slice(0,12);
+}
+function setHash(path) { location.hash = path; }
+function routeParts() {
+  const raw = decodeURIComponent(location.hash.replace(/^#/,''));
+  if (!raw) return ['home'];
+  return raw.split('/');
+}
+function currentQueryFromRoute(parts) {
+  if (parts[0] === 'search') return parts.slice(1).join('/') || '';
+  if (parts[0] === 'page') return parts.slice(2).join('/') || state.lastQuery || '';
+  return state.lastQuery || '';
+}
+function render() {
+  const parts = routeParts();
+  if (parts[0] === 'search') renderResults(parts.slice(1).join('/'));
+  else if (parts[0] === 'page') renderFullPage(parts[1], parts.slice(2).join('/'));
+  else renderHome();
+}
+function performSearch(inputId) {
+  const input = document.getElementById(inputId);
+  const q = input ? input.value.trim() : '';
+  state.lastQuery = q;
+  setHash('search/' + encodeURIComponent(q));
+}
+function renderHome() {
+  app.innerHTML = `
+    <main class="home">
+      <div class="topbar">
+        <button type="button" data-action="sample" data-query="観光 Deep Research">観光情報<\/button>
+        <button type="button" data-action="sample" data-query="ログイン拡張 html">拡張HTML<\/button>
+        <div class="apps">9<\/div>
+        <button type="button" class="sign" data-action="open-login-page">ログイン<\/button>
+      <\/div>
+      <section class="center">
+        ${logo('logoText')}
+        <div class="searchBox" role="search">
+          <span class="searchIcon">⌕<\/span>
+          <input id="homeSearch" autocomplete="off" placeholder="検索" value="">
+          <button type="button" class="mic" data-action="sample" data-query="奈良 夜観光">●<\/button>
+        <\/div>
+        <div class="homeBtns">
+          <button type="button" data-action="search" data-input="homeSearch">Sora 検索<\/button>
+          <button type="button" data-action="sample" data-query="観光 Deep Research">I'm Feeling Deep<\/button>
+        <\/div>
+        <div class="hint">例：<button class="pillBtn" type="button" data-action="sample" data-query="京都 観光">京都 観光<\/button> <button class="pillBtn" type="button" data-action="sample" data-query="MiraGate ダウンロード">MiraGate ダウンロード<\/button> <button class="pillBtn" type="button" data-action="sample" data-query="HTML ログイン拡張">HTML ログイン拡張<\/button><br>検索結果を押すと、横や下ではなく、普通のリンク先みたいに全画面ページへ移動します。<\/div>
+      <\/section>
+    <\/main>`;
+  bindEvents();
+  setTimeout(()=>{ const i=document.getElementById('homeSearch'); if(i) i.focus(); },0);
+}
+function renderResults(query) {
+  state.lastQuery = query || '';
+  const results = searchRecords(query);
+  app.innerHTML = `
+    <header class="header">
+      <button type="button" data-action="home" style="border:0;background:transparent;padding:0">${logo('logoSmall')}<\/button>
+      <div class="searchBox" role="search">
+        <span class="searchIcon">⌕<\/span>
+        <input id="resultSearch" autocomplete="off" value="${esc(query)}">
+        <button type="button" class="mic" data-action="search" data-input="resultSearch">検索<\/button>
+      <\/div>
+    <\/header>
+    <nav class="tabs" aria-label="検索タイプ">
+      <span class="tabActive">すべて<\/span>
+      <span>観光<\/span>
+      <span>Deep Research<\/span>
+      <span>ダウンロード<\/span>
+      <span>ログイン<\/span>
+    <\/nav>
+    <main class="resultsWrap">
+      <div class="stats">約 ${results.length} 件の結果（0.03 秒）<\/div>
+      ${results.length ? results.map(resultHTML).join('') : noResultsHTML(query)}
+    <\/main>`;
+  bindEvents();
+}
+function resultHTML(rec) {
+  const icon = rec.kind === 'extension' ? '↓' : (rec.kind === 'tool' ? '⚙' : 'i');
+  const tags = rec.kind === 'extension' ? ['HTML拡張','ダウンロード','ログイン'] : rec.kind === 'tool' ? ['読み込みテスト','ログイン'] : ['観光情報','説明ページ'];
+  return `<article class="result">
+    <div class="resultTop"><span class="favicon">${icon}<\/span><div><div>${esc(rec.title.split('：')[0])}<\/div><div class="url">${esc(rec.url)}<\/div><\/div><\/div>
+    <a href="#page/${encodeURIComponent(rec.id)}/${encodeURIComponent(state.lastQuery || '')}" class="resultTitle" data-action="open-page" data-id="${esc(rec.id)}">${esc(rec.title)}<\/a>
+    <div class="snippet">${esc(rec.description)}<\/div>
+    <div class="tagRow">${tags.map(t=>`<span class="tag">${esc(t)}<\/span>`).join('')}<\/div>
+  <\/article>`;
+}
+function noResultsHTML(query) {
+  return `<div class="noResults"><b>「${esc(query)}」に完全一致する結果はありません。<\/b><br>「観光」「Deep Research」「MiraGate」「ログイン拡張 html」などで検索してみてください。<\/div>`;
+}
+function renderFullPage(id, query) {
+  const rec = RECORDS.find(r => r.id === id) || RECORDS[0];
+  const encodedQ = encodeURIComponent(query || state.lastQuery || '');
+  const backHash = `#search/${encodedQ}`;
+  if (rec.kind === 'extension') renderExtensionPage(rec, backHash);
+  else if (rec.kind === 'tool') renderLoginToolPage(rec, backHash);
+  else renderArticlePage(rec, backHash);
+  bindEvents();
+}
+function siteHeaderHTML(url, backHash) {
+  return `<header class="siteHeader">
+    <a class="backBtn" href="${backHash}" data-action="back-results">← 検索結果<\/a>
+    <div class="siteAddress">${esc(url)}<\/div>
+    <button type="button" class="backBtn" data-action="home">検索トップ<\/button>
+  <\/header>`;
+}
+function renderArticlePage(rec, backHash) {
+  const sections = (rec.sections||[]).map(s=>`<section><h2>${esc(s.h)}<\/h2><p>${esc(s.p)}<\/p><\/section>`).join('');
+  app.innerHTML = `${siteHeaderHTML(rec.url, backHash)}
+    <main class="siteMain">
+      <div class="breadcrumb">Sora Search ＞ 観光情報 ＞ 全画面ページ<\/div>
+      <div class="articleHero"><h1>${esc(rec.title)}<\/h1><p>${esc(rec.description)}<\/p><\/div>
+      <div class="articleGrid">
+        <div class="articleBody">${sections}<\/div>
+        <aside class="sideCard">
+          <h3>このページの使い方<\/h3>
+          <p>検索結果から開いた「リンク先ページ」なので、横パネルや下展開ではありません。ブラウザの戻る操作でも検索結果へ戻れます。<\/p>
+          <button type="button" class="secondaryBtn" data-action="copy-url" data-url="${esc(rec.url)}">URL風文字をコピー<\/button>
+        <\/aside>
+      <\/div>
+    <\/main>`;
+}
+function renderExtensionPage(rec, backHash) {
+  app.innerHTML = `${siteHeaderHTML(rec.url, backHash)}
+    <main class="siteMain">
+      <div class="breadcrumb">Sora Search ＞ 拡張HTMLダウンロード ＞ 全画面ページ<\/div>
+      <section class="downloadHero">
+        <div class="downloadTop">
+          <div class="bigIcon" style="background:${esc(rec.color)}">${esc((rec.name||'?').slice(0,1))}<\/div>
+          <div>
+            <h1>${esc(rec.name)} Login Extension<\/h1>
+            <p>${esc(rec.description)}<br>検索結果を押したあと、このように全画面のダウンロードページとして開きます。<\/p>
+          <\/div>
+        <\/div>
+        <div class="actionRow">
+          <button type="button" class="primaryBtn" data-action="download-extension" data-id="${esc(rec.id)}">HTMLをダウンロード<\/button>
+          <button type="button" class="secondaryBtn" data-action="open-login-loader">読み込みテストへ<\/button>
+          <button type="button" class="secondaryBtn" data-action="show-code" data-id="${esc(rec.id)}">HTMLコード表示<\/button>
+        <\/div>
+        <div class="infoBoxes">
+          <div class="infoBox"><b>ファイル名<\/b><span>${esc(rec.filename)}<\/span><\/div>
+          <div class="infoBox"><b>テスト用パスワード<\/b><span>${esc(rec.password || '旧形式は sora!')}<\/span><\/div>
+          <div class="infoBox"><b>読み込み方法<\/b><span>下のログイン読み込みページで、このHTMLを選択します。<\/span><\/div>
+        <\/div>
+        <pre id="codePreview" class="codeBox hidden"><\/pre>
+      <\/section>
+      ${loginLoaderHTML()}
+    <\/main>`;
+  loadImported();
+  renderMethodsSoon(rec.name);
+}
+function renderLoginToolPage(rec, backHash) {
+  app.innerHTML = `${siteHeaderHTML(rec.url, backHash)}
+    <main class="siteMain">
+      <div class="breadcrumb">Sora Search ＞ ツール ＞ 全画面ページ<\/div>
+      <div class="articleHero"><h1>${esc(rec.title)}<\/h1><p>${esc(rec.description)}<\/p><\/div>
+      ${loginLoaderHTML()}
+    <\/main>`;
+  loadImported();
+  renderMethodsSoon();
+}
+function loginLoaderHTML() {
+  return `<section class="loginPanel" id="loginLoader">
+    <h2>HTMLを読み込んでログイン方法を追加<\/h2>
+    <p>ダウンロードした拡張HTMLを選ぶと、下のログインボタンに追加されます。MiraGateの古いmeta形式にも対応しています。<\/p>
+    <div class="fileDrop">
+      <input type="file" id="extensionFile" accept=".html,text/html">
+    <\/div>
+    <div id="methodList" class="methodList"><\/div>
+    <div class="loginForm">
+      <input id="passwordInput" type="password" placeholder="選んだ拡張のパスワード">
+      <button type="button" class="primaryBtn" data-action="try-login">ログインする<\/button>
+    <\/div>
+    <div class="status" id="loginStatus"><\/div>
+  <\/section>`;
+}
+function renderMethodsSoon(preferName) {
+  setTimeout(()=>{ renderMethods(preferName); }, 0);
+}
+function loadImported() {
+  try {
+    state.imported = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch(e) { state.imported = []; }
+}
+function saveImported() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.imported));
+}
+function defaultMethodForName(name) { return EXTENSIONS.find(e => e.name === name); }
+function allMethods() {
+  const base = EXTENSIONS.map(e=>({id:e.id,name:e.name,password:e.password,key:e.key||'',source:'built-in',color:e.color}));
+  const merged = [...base];
+  for (const im of state.imported) {
+    if (!merged.some(m=>m.name === im.name)) merged.push(im);
+  }
+  return merged;
+}
+function renderMethods(preferName) {
+  const list = document.getElementById('methodList');
+  if (!list) return;
+  const methods = allMethods();
+  if (!state.selectedMethod) {
+    const preferred = methods.find(m=>m.name === preferName) || methods[0];
+    state.selectedMethod = preferred ? preferred.name : null;
+  }
+  list.innerHTML = methods.map(m=>`<button type="button" class="methodBtn ${state.selectedMethod===m.name?'active':''}" data-action="select-method" data-name="${esc(m.name)}">${esc(m.name)}<\/button>`).join('');
+}
+function parseExtensionHTML(text, fileName) {
+  const doc = new DOMParser().parseFromString(text, 'text/html');
+  const meta = name => doc.querySelector(`meta[name="${CSS.escape(name)}"]`)?.getAttribute('content') || '';
+  const title = doc.querySelector('title')?.textContent?.trim() || fileName || 'Unknown Extension';
+  let name = meta('sora-login-extension-name') || meta('miragate-extension-name') || title.replace(/\s*Login Extension\s*/i,'').replace(/\.html$/i,'').trim();
+  let key = meta('sora-login-extension-key') || meta('miragate-extension-key') || '';
+  let password = meta('sora-login-extension-password') || '';
+  if (!password && /MIRAGATE-PC-LOGIN-HTML-OK/.test(text)) password = 'sora!';
+  if (!key && /SORA-LOGIN-EXTENSION/.test(text)) key = 'SORA-LOGIN-EXTENSION';
+  if (!name) name = 'Imported Extension';
+  if (!key && !/login|extension|miragate/i.test(text)) throw new Error('ログイン拡張HTMLとして認識できませんでした。');
+  return { id:'imported-' + Date.now(), name, key, password: password || 'sora!', source:'imported', color:'#1a73e8' };
+}
+function handleFileSelect(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const ext = parseExtensionHTML(String(reader.result||''), file.name);
+      state.imported = state.imported.filter(x => x.name !== ext.name);
+      state.imported.push(ext);
+      state.selectedMethod = ext.name;
+      saveImported();
+      renderMethods(ext.name);
+      setStatus(`${ext.name} をログイン方法に追加しました。`);
+    } catch (err) {
+      setStatus(err.message || '読み込みに失敗しました。', true);
+    }
+  };
+  reader.onerror = () => setStatus('ファイルを読めませんでした。', true);
+  reader.readAsText(file, 'utf-8');
+}
+function setStatus(text, isError=false) {
+  const el = document.getElementById('loginStatus');
+  if (el) { el.textContent = text; el.style.color = isError ? '#d93025' : '#188038'; }
+}
+function tryLogin() {
+  const methods = allMethods();
+  const m = methods.find(x => x.name === state.selectedMethod) || methods[0];
+  const pass = document.getElementById('passwordInput')?.value || '';
+  if (!m) return setStatus('ログイン方法がありません。', true);
+  setStatus('認証中...');
+  setTimeout(()=>{
+    if (pass === (m.password || 'sora!')) setStatus(`${m.name} でログイン成功。`);
+    else setStatus('パスワードが違います。', true);
+  }, 450);
+}
+function downloadExtension(id) {
+  const rec = EXTENSIONS.find(e => e.id === id);
+  if (!rec) return;
+  const blob = new Blob([rec.html], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = rec.filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  showToast(`${rec.filename} をダウンロードします`);
+}
+function showCode(id) {
+  const rec = EXTENSIONS.find(e => e.id === id);
+  const pre = document.getElementById('codePreview');
+  if (!rec || !pre) return;
+  pre.textContent = rec.html;
+  pre.classList.toggle('hidden');
+}
+function showToast(text) {
+  toastEl.textContent = text;
+  toastEl.classList.add('show');
+  setTimeout(()=>toastEl.classList.remove('show'), 1800);
+}
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(()=>showToast('コピーしました')).catch(()=>fallbackCopy(text));
+  } else fallbackCopy(text);
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('コピーしました'); } catch(e) { showToast('コピーできませんでした'); }
+  ta.remove();
+}
+function bindEvents() {
+  document.querySelectorAll('[data-action]').forEach(el => {
+    el.addEventListener('click', evt => {
+      const action = el.getAttribute('data-action');
+      if (action === 'search') { evt.preventDefault(); performSearch(el.getAttribute('data-input')); }
+      if (action === 'sample') { evt.preventDefault(); setHash('search/' + encodeURIComponent(el.getAttribute('data-query') || '')); }
+      if (action === 'home') { evt.preventDefault(); location.hash = ''; }
+      if (action === 'open-login-page') { evt.preventDefault(); setHash('page/login-lab/' + encodeURIComponent(state.lastQuery || 'ログイン拡張 html')); }
+      if (action === 'open-login-loader') { evt.preventDefault(); document.getElementById('loginLoader')?.scrollIntoView({behavior:'smooth',block:'start'}); }
+      if (action === 'download-extension') { evt.preventDefault(); downloadExtension(el.getAttribute('data-id')); }
+      if (action === 'show-code') { evt.preventDefault(); showCode(el.getAttribute('data-id')); }
+      if (action === 'select-method') { evt.preventDefault(); state.selectedMethod = el.getAttribute('data-name'); renderMethods(); }
+      if (action === 'try-login') { evt.preventDefault(); tryLogin(); }
+      if (action === 'copy-url') { evt.preventDefault(); copyText(el.getAttribute('data-url') || ''); }
+    }, {passive:false});
+  });
+  ['homeSearch','resultSearch'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') performSearch(id); });
+  });
+  const fileInput = document.getElementById('extensionFile');
+  if (fileInput) fileInput.addEventListener('change', e => handleFileSelect(e.target.files && e.target.files[0]));
+}
+window.addEventListener('hashchange', render);
+window.addEventListener('DOMContentLoaded', () => { loadImported(); render(); });
+</script>
+</body>
+</html>
